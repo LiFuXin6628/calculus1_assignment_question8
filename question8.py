@@ -2,6 +2,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 
+def format_approx(value):
+    """Display numerical results with six digits after the decimal point."""
+    try:
+        number = complex(value.evalf(20))
+    except (TypeError, ValueError):
+        return "Cannot evaluate numerically"
+    if not (np.isfinite(number.real) and np.isfinite(number.imag)):
+        return "No finite result"
+    real = round(number.real, 6)
+    imaginary = round(number.imag, 6)
+    if imaginary == 0:
+        return f"{real:.6f}"
+    sign = "+" if imaginary > 0 else "-"
+    return f"{real:.6f} {sign} {abs(imaginary):.6f}i"
+
+
 def main():
     x = sp.Symbol("x", real = True)
     expression = input("Input f(x) - for example: x**2 - 1: ")
@@ -32,7 +48,7 @@ def main():
     right = sp.limit(difference_quotient, x, c, dir = "+")
 
     if left.is_real and left.is_finite and (left - right).equals(0):
-        derivative_result = f"f'({c}) = {left} (approximately {left.evalf(10)})"
+        derivative_result = f"f'({c}) ≈ {format_approx(left)}"
     else:
         derivative_result = f"Cannot find a finite two-sided derivative at x = {c}"
 
@@ -40,8 +56,8 @@ def main():
 
     integral = sp.integrate(f, (x, a, b))
     volume = sp.integrate(sp.pi * f**2, (x, a, b))
-    integral_result = f"I = {integral} (approximately {integral.evalf(10)})"
-    volume_result = f"V = {volume} (approximately {volume.evalf(10)})"
+    integral_result = f"I ≈ {format_approx(integral)}"
+    volume_result = f"V ≈ {format_approx(volume)}"
     print(integral_result)
     print(volume_result)
 
